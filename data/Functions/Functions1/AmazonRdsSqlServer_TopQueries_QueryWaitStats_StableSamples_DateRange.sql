@@ -1,0 +1,62 @@
+﻿CREATE FUNCTION [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_StableSamples_DateRange]
+(
+    @MinDate AS BIGINT
+    , @MaxDate AS BIGINT
+    , @MaxSamples AS INT
+)
+RETURNS TABLE
+AS
+RETURN
+WITH [SightedIds]([Id]) AS
+(
+    SELECT DISTINCT [Id]
+    FROM [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Sightings]
+    WHERE [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Sightings].[SightingDate] >= @MinDate AND [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Sightings].[SightingDate] <= @MaxDate
+)
+, [SightedInstances]([Id], [ParentId], [IdCollectionDate], [AmazonRdsSqlServer_Name], [AmazonRdsSqlServer_TopQueries_DatabaseName], [AmazonRdsSqlServer_TopQueries_SqlHandle], [AmazonRdsSqlServer_TopQueries_StatementEnd], [AmazonRdsSqlServer_TopQueries_StatementStart], [AmazonRdsSqlServer_TopQueries_QueryWaitStats_WaitType]) AS
+(
+    SELECT [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[Id]
+    , [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[ParentId]
+    , [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[CollectionDate] AS [IdCollectionDate]
+    , [data].[AmazonRdsSqlServer_Keys].[_Name] AS [AmazonRdsSqlServer_Name]
+    , [data].[AmazonRdsSqlServer_TopQueries_Keys].[_DatabaseName] AS [AmazonRdsSqlServer_TopQueries_DatabaseName]
+    , [data].[AmazonRdsSqlServer_TopQueries_Keys].[_SqlHandle] AS [AmazonRdsSqlServer_TopQueries_SqlHandle]
+    , [data].[AmazonRdsSqlServer_TopQueries_Keys].[_StatementEnd] AS [AmazonRdsSqlServer_TopQueries_StatementEnd]
+    , [data].[AmazonRdsSqlServer_TopQueries_Keys].[_StatementStart] AS [AmazonRdsSqlServer_TopQueries_StatementStart]
+    , [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[_WaitType] AS [AmazonRdsSqlServer_TopQueries_QueryWaitStats_WaitType]
+    FROM [SightedIds]
+     INNER JOIN [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys] ON [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[Id] = [SightedIds].[Id]
+     INNER JOIN [data].[AmazonRdsSqlServer_TopQueries_Keys] ON [data].[AmazonRdsSqlServer_TopQueries_Keys].[Id] = [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_Keys].[ParentId]
+     INNER JOIN [data].[AmazonRdsSqlServer_Keys] ON [data].[AmazonRdsSqlServer_Keys].[Id] = [data].[AmazonRdsSqlServer_TopQueries_Keys].[ParentId]
+)
+SELECT
+[SightedInstances].[Id]
+, [SightedInstances].[ParentId]
+, [SightedInstances].[IdCollectionDate]
+, [utils].[TicksToDateTime]([SightedInstances].[IdCollectionDate]) AS [IdCollectionDate_DateTime]
+, [SightedInstances].[AmazonRdsSqlServer_Name]
+, [SightedInstances].[AmazonRdsSqlServer_TopQueries_DatabaseName]
+, [SightedInstances].[AmazonRdsSqlServer_TopQueries_SqlHandle]
+, [SightedInstances].[AmazonRdsSqlServer_TopQueries_StatementEnd]
+, [SightedInstances].[AmazonRdsSqlServer_TopQueries_StatementStart]
+, [SightedInstances].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_WaitType]
+, [Leaf].[CollectionDate]
+, [utils].[TicksToDateTime]([Leaf].[CollectionDate]) AS [CollectionDate_DateTime]
+, [Leaf].[_LoginName] AS [AmazonRdsSqlServer_TopQueries_QueryWaitStats_LoginName]
+, [Leaf].[_ProgramName] AS [AmazonRdsSqlServer_TopQueries_QueryWaitStats_ProgramName]
+FROM
+ [SightedInstances]
+LEFT OUTER JOIN
+(
+    SELECT [Id], MAX([CollectionDate]) as [GreatestMinDate]
+    FROM [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_StableSamples]
+    WHERE [CollectionDate] <= @MinDate
+    GROUP BY [Id]
+)
+[GreatestMinDates]
+ ON [SightedInstances].[Id] = [GreatestMinDates].[Id]
+INNER JOIN
+ [data].[AmazonRdsSqlServer_TopQueries_QueryWaitStats_StableSamples] [Leaf]
+ ON [SightedInstances].[Id] = [Leaf].[Id]
+WHERE [Leaf].[CollectionDate] >= COALESCE([GreatestMinDates].[GreatestMinDate], @MinDate)
+AND [Leaf].[CollectionDate] <= @MaxDate

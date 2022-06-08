@@ -1,0 +1,25 @@
+﻿CREATE TABLE [alert].[SuppressionWindows] (
+    [Id]                         INT            IDENTITY (1, 1) NOT NULL,
+    [Name]                       NVARCHAR (255) COLLATE Latin1_General_CS_AS_KS_WS NOT NULL,
+    [Start]                      BIGINT         NOT NULL,
+    [Duration]                   BIGINT         NOT NULL,
+    [Monday]                     BIT            NOT NULL,
+    [Tuesday]                    BIT            NOT NULL,
+    [Wednesday]                  BIT            NOT NULL,
+    [Thursday]                   BIT            NOT NULL,
+    [Friday]                     BIT            NOT NULL,
+    [Saturday]                   BIT            NOT NULL,
+    [Sunday]                     BIT            NOT NULL,
+    [AlertTypeGroupToSuppressId] INT            NOT NULL,
+    [ScheduleFrequencyId]        INT            NULL,
+    [ScheduleSetPositionId]      INT            NULL,
+    [AlertSuppressionLevelId]    INT            NOT NULL,
+    [StartDate]                  DATETIME2 (7)  NULL,
+    CONSTRAINT [AlertSuppressionWindows_Id] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [FK_AlertSuppressionLevel] FOREIGN KEY ([AlertSuppressionLevelId]) REFERENCES [alert].[AlertSuppressionLevel] ([Id]),
+    CONSTRAINT [FK_AlertTypeGroupToSuppress] FOREIGN KEY ([AlertTypeGroupToSuppressId]) REFERENCES [alert].[AlertTypeGroupToSuppress] ([Id]),
+    CONSTRAINT [FK_ScheduleFrequency] FOREIGN KEY ([ScheduleFrequencyId]) REFERENCES [alert].[ScheduleFrequency] ([Id]),
+    CONSTRAINT [FK_ScheduleSetPosition] FOREIGN KEY ([ScheduleSetPositionId]) REFERENCES [alert].[ScheduleSetPosition] ([Id]),
+    CONSTRAINT [SuppressionWindows_Name] UNIQUE NONCLUSTERED ([Name] ASC)
+);
+

@@ -1,0 +1,7 @@
+﻿CREATE TABLE [settings].[Group] (
+    [GroupId] UNIQUEIDENTIFIER NOT NULL,
+    [Name]    NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NOT NULL,
+    CONSTRAINT [Group_GroupId] PRIMARY KEY CLUSTERED ([GroupId] ASC),
+    CONSTRAINT [Group_Name] UNIQUE NONCLUSTERED ([Name] ASC)
+);
+

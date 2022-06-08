@@ -1,0 +1,26 @@
+﻿CREATE TABLE [settings].[AzureSqlServers] (
+    [Id]                       UNIQUEIDENTIFIER NOT NULL,
+    [CreatedDate]              BIGINT           NOT NULL,
+    [ModifiedDate]             BIGINT           NOT NULL,
+    [IsValid]                  BIT              NOT NULL,
+    [IsSuspended]              BIT              NOT NULL,
+    [CredentialsDiscriminator] INT              NOT NULL,
+    [User]                     NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [Domain]                   NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [Password]                 NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [Name]                     NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NOT NULL,
+    [Port]                     INT              NULL,
+    [NetworkLibrary]           NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [PacketSize]               INT              NULL,
+    [ConnectionTimeout]        INT              NULL,
+    [ExecutionTimeout]         INT              NULL,
+    [Encrypt]                  BIT              NOT NULL,
+    [IsManagedInstance]        BIT              NOT NULL,
+    [RequestedLicenceLevel]    INT              NOT NULL,
+    [EffectiveLicenceLevel]    INT              NOT NULL,
+    [IsAddressDetected]        BIT              CONSTRAINT [AzureSqlServers_df_IsAddressDetected] DEFAULT ((0)) NOT NULL,
+    [HasDetectionFailed]       BIT              CONSTRAINT [AzureSqlServers_df_HasDetectionFailed] DEFAULT ((0)) NOT NULL,
+    CONSTRAINT [AzureSqlServers_Id] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [AzureSqlServers_Name] UNIQUE NONCLUSTERED ([Name] ASC)
+);
+

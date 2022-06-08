@@ -1,0 +1,28 @@
+﻿CREATE TABLE [settings].[SqlServers] (
+    [Id]                       UNIQUEIDENTIFIER NOT NULL,
+    [CreatedDate]              BIGINT           NOT NULL,
+    [ModifiedDate]             BIGINT           NOT NULL,
+    [IsValid]                  BIT              NOT NULL,
+    [IsSuspended]              BIT              NOT NULL,
+    [CredentialsDiscriminator] INT              NOT NULL,
+    [User]                     NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [Domain]                   NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [Password]                 NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [ParentId]                 UNIQUEIDENTIFIER NOT NULL,
+    [Name]                     NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NOT NULL,
+    [Address]                  NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [IsTraceEnabled]           BIT              NOT NULL,
+    [Port]                     INT              NULL,
+    [NetworkLibrary]           NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [PacketSize]               INT              NULL,
+    [ConnectionTimeout]        INT              NULL,
+    [ExecutionTimeout]         INT              NULL,
+    [Encrypt]                  BIT              NOT NULL,
+    [Alias]                    NVARCHAR (255)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    [TrustServerCertificate]   BIT              CONSTRAINT [SqlServers_df_TrustServerCertificate] DEFAULT ((0)) NOT NULL,
+    [ConnectionString]         NVARCHAR (MAX)   COLLATE Latin1_General_CS_AS_KS_WS NULL,
+    CONSTRAINT [SqlServers_Id] PRIMARY KEY CLUSTERED ([Id] ASC),
+    CONSTRAINT [SqlServers_Clusters] FOREIGN KEY ([ParentId]) REFERENCES [settings].[Clusters] ([Id]) ON DELETE CASCADE,
+    CONSTRAINT [SqlServers_ParentId_Name] UNIQUE NONCLUSTERED ([ParentId] ASC, [Name] ASC)
+);
+
